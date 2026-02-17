@@ -9,23 +9,33 @@ This project focuses on arrays, async programming, and clean architecture using 
 1️⃣ Destination Service - Sonal 
 
 Responsible for:-
+
 Fetching country data from an external API
+
 Returning clean formatted data (not raw API response)
+
 Handling async/await + errors safely
 
 2️⃣ Itinerary Engine - Navya
 
 Responsible for:
+
 Creating trips
+
 Adding activities
+
 Filtering & sorting activities
+
 Managing trip storage (in-memory)
 
 3️⃣ Budget Manager -Priyanka
 
-Responsible for:
+Responsible for:-
+
 Calculating total trip cost
+
 Identifying high-cost activities
+
 Optional: totals per category
 
 🧠 User Stories
