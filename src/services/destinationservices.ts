@@ -30,6 +30,7 @@ export const getIndiaInfo = async (): Promise<DestinationInfo> => {
   }
 };
 
+// FOR FRANCE-
 export const getFranceInfo = async (): Promise<DestinationInfo> => {
   try {
     const response = await fetch('https://restcountries.com/v3.1/name/france');
@@ -46,6 +47,8 @@ export const getFranceInfo = async (): Promise<DestinationInfo> => {
   }
 };
 
+
+//FOR SWEDEN-
 export const getSwedenInfo = async (): Promise<DestinationInfo> => {
   try {
     const response = await fetch('https://restcountries.com/v3.1/name/sweden');
@@ -62,6 +65,7 @@ export const getSwedenInfo = async (): Promise<DestinationInfo> => {
   }
 };
 
+//FOR GERMANY-
 export const getGermanyInfo = async (): Promise<DestinationInfo> => {
   try {
     const response = await fetch('https://restcountries.com/v3.1/name/germany');
@@ -77,6 +81,8 @@ export const getGermanyInfo = async (): Promise<DestinationInfo> => {
     throw new Error('Could not fetch Germany data');
   }
 };
+
+
 
 // ─── Fetch All Countries ──────────────────────────────────────────────────────
 
