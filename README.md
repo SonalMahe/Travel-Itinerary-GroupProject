@@ -4,15 +4,17 @@
 A command-line (CLI) application built with TypeScript that helps travelers plan trips, manage activities, and track expenses.
 This project focuses on arrays, async programming, and clean architecture using team collaboration.
 
-👥 Team Roles--
+👥 Our Team Roles--
 
 1️⃣ Destination Service - Sonal 
+
 Responsible for:-
 Fetching country data from an external API
 Returning clean formatted data (not raw API response)
 Handling async/await + errors safely
 
 2️⃣ Itinerary Engine - Navya
+
 Responsible for:
 Creating trips
 Adding activities
@@ -20,13 +22,16 @@ Filtering & sorting activities
 Managing trip storage (in-memory)
 
 3️⃣ Budget Manager -Priyanka
+
 Responsible for:
 Calculating total trip cost
 Identifying high-cost activities
 Optional: totals per category
 
 🧠 User Stories
+
 #. The app should allow a traveler to:
+
 1. Tracks expenses and calculates totals
 2. Create a new trip (destination + start date)
 3. Add activities (name, cost, category, time)
