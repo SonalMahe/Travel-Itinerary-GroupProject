@@ -1,4 +1,4 @@
-// src/services/destinationService.ts
+// src/services/destinationservices.ts
 // Fetches country information from the REST Countries API
 // Countries: India, France, Sweden, Germany
 
@@ -22,8 +22,7 @@ export const getIndiaInfo = async (): Promise<DestinationInfo> => {
       countryName: data[0].name.common,
       currency: Object.keys(data[0].currencies)[0] ,
       capital: data[0].capital[0] ,
-
-      flag: data[0].flag,
+      flag: data[0].flag.alternativeText || data[0].flag,
       region: data[0].region,
     };
   } catch (error) {
