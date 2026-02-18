@@ -20,8 +20,8 @@ export const getIndiaInfo = async (): Promise<DestinationInfo> => {
     const data = await response.json();
     return {
       countryName: data[0].name.common,
-      currency: Object.keys(data[0].currencies)[0] ,
-      capital: data[0].capital[0] ,
+      currency: Object.keys(data[0].currencies)[0],
+      capital: data[0].capital[0],
       flag: data[0].flag.alternativeText || data[0].flag,
       region: data[0].region,
     };
@@ -69,6 +69,7 @@ export const getGermanyInfo = async (): Promise<DestinationInfo> => {
   try {
     const response = await fetch("https://restcountries.com/v3.1/name/germany");
     const data = await response.json();
+
     return {
       countryName: data[0].name.common,
       capital: data[0].capital[0],
