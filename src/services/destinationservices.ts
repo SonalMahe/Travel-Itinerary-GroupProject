@@ -14,13 +14,14 @@ export type DestinationInfo = {
 
 // ─── Individual Country Fetchers ──────────────────────────────────────────────
 
-export const getIndiaInfo = async (country:string): Promise<DestinationInfo> => {
+export const getIndiaInfo = async (): Promise<DestinationInfo> => {
   try {
-    const response = await fetch(`https://restcountries.com/v3.1/name/${country}`);
+    const response = await fetch("https://restcountries.com/v3.1/name/india");
     const data = await response.json();
     const countries = data[0].currencies;
     const firstCurrency: any = Object.values(countries)[0];  
-    
+    console.log("India data:", data[0]);
+    console.log("India currencies:", firstCurrency);
     return {
       countryName: data[0].name.common,
       currency: firstCurrency.name,
@@ -87,8 +88,8 @@ export const getIndiaInfo = async (country:string): Promise<DestinationInfo> => 
 
 // ─── Fetch All Countries ──────────────────────────────────────────────────────
 
-export const getAllDestinations = async (country:string): Promise<DestinationInfo[]> => {
-  const india = await getIndiaInfo(country);
+export const getAllDestinations = async (): Promise<DestinationInfo[]> => {
+  const india = await getIndiaInfo();
   //const france = await getFranceInfo();
 //   const sweden = await getSwedenInfo();
 //   const germany = await getGermanyInfo();
