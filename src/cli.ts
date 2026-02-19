@@ -1,7 +1,9 @@
-import { getIndiaInfo, getAllDestinations,} from "./services/destinationservices.js";
+import inquirer from "inquirer";
 
-const india = await getIndiaInfo();
-console.log(india.flag, india.countryName, india.currency);
+import { getAllDestinations,} from "./services/destinationservices.js";
+
+//const india = await getIndiaInfo();
+//console.log(india.flag, india.countryName, india.currency);
 
 // Or get all 4 at once:
 const all = await getAllDestinations();
@@ -15,3 +17,16 @@ all.forEach((country: any) =>
     country.currency,
   ),
 );
+async function main() {
+  const answers = await inquirer.prompt([
+    {
+      type: "input",
+      name: "name",
+      message: "What is your name?"
+    }
+  ]);
+
+  console.log("Hello", answers.name);
+}
+
+main();

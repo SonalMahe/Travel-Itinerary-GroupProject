@@ -22,11 +22,15 @@
   "homepage": "https://github.com/SonalMahe/Travel-Itinerary-GroupProject#readme",
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@types/inquirer": "^9.0.9",
     "eslint": "^9.39.2",
     "globals": "^17.3.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.55.0"
+  },
+  "dependencies": {
+    "inquirer": "^13.2.5"
   }
 }
