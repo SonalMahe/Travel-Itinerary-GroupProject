@@ -19,9 +19,7 @@ export const getIndiaInfo = async (): Promise<DestinationInfo> => {
     const response = await fetch("https://restcountries.com/v3.1/name/india");
     const data = await response.json();
     const countries = data[0].currencies;
-    const firstCurrency: any = Object.values(countries)[0];  
-    console.log("India data:", data[0]);
-    console.log("India currencies:", firstCurrency);
+    const firstCurrency: any = Object.values(countries)[0];    
     return {
       countryName: data[0].name.common,
       currency: firstCurrency.name,
@@ -39,10 +37,12 @@ export const getFranceInfo = async (): Promise<DestinationInfo> => {
   try {
     const response = await fetch("https://restcountries.com/v3.1/name/france");
     const data = await response.json();
+    const countries = data[0].currencies;
+    const firstCurrency: any = Object.values(countries)[0];
     return {
       countryName: data[0].name.common,
       capital: data[0].capital[0],
-      currency: Object.keys(data[0].currencies)[0],
+      currency:  firstCurrency.name,
       flag: data[0].flag,
       region: data[0].region,
     };
@@ -56,10 +56,12 @@ export const getSwedenInfo = async (): Promise<DestinationInfo> => {
   try {
     const response = await fetch("https://restcountries.com/v3.1/name/sweden");
     const data = await response.json();
+       const countries = data[0].currencies;
+    const firstCurrency: any = Object.values(countries)[0];
     return {
       countryName: data[0].name.common,
       capital: data[0].capital[0],
-      currency: Object.keys(data[0].currencies)[0],
+      currency: firstCurrency.name,
       flag: data[0].flag,
       region: data[0].region,
     };
@@ -73,11 +75,13 @@ export const getGermanyInfo = async (): Promise<DestinationInfo> => {
   try {
     const response = await fetch("https://restcountries.com/v3.1/name/germany");
     const data = await response.json();
+       const countries = data[0].currencies;
+    const firstCurrency: any = Object.values(countries)[0];
 
     return {
       countryName: data[0].name.common,
       capital: data[0].capital[0],
-      currency: Object.keys(data[0].currencies)[0],
+      currency: firstCurrency.name,
       flag: data[0].flag,
       region: data[0].region,
     };
