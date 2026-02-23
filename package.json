@@ -2,7 +2,7 @@
   "name": "travel-itinerary-project",
   "version": "1.0.0",
   "description": "CLI application",
-  "main": "index.js",
+  "main": "src/cli.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
@@ -35,6 +35,6 @@
   },
   "dependencies": {
     "chalk": "^5.6.2",
-    "inquirer": "^13.2.5"
+    "inquirer": "^8.2.7"
   }
 }

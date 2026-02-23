@@ -1,0 +1,74 @@
+{
+  "India": {
+    "currency": "₹",
+    "food": [
+      { "name": "Briyani", "cost": 100 },
+      { "name": "Masala Dosa", "cost": 80 },
+      { "name": "Thai Curry", "cost": 20 }
+    ],
+    "transport": [
+      { "name": "Bus", "cost": 15 },
+      { "name": "Metro Ride", "cost": 30 },
+      { "name": "Taxi", "cost": 100 }
+    ],
+    "sightseeing": [
+      { "name": "Taj Mahal", "cost": 200 },
+      { "name": "Red Fort", "cost": 100 },
+      { "name": "Jaipur Palace", "cost": 120 }
+    ]
+  },
+  "France": {
+    "currency": "€",
+    "food": [
+      { "name": "Croissant & Coffee", "cost": 10 },
+      { "name": "French Dinner", "cost": 35 },
+      { "name": "Macarons", "cost": 12 }
+    ],
+    "transport": [
+      { "name": "Paris Metro", "cost": 4 },
+      { "name": "Taxi", "cost": 20 },
+      { "name": "Train Ticket", "cost": 30 }
+    ],
+    "sightseeing": [
+      { "name": "Eiffel Tower", "cost": 25 },
+      { "name": "Louvre Museum", "cost": 30 },
+      { "name": "Seine River Cruise", "cost": 40 }
+    ]
+  },
+  "Sweden": {
+    "currency": "kr",
+    "food": [
+      { "name": "Swedish Meatballs", "cost": 18 },
+      { "name": "Fika", "cost": 9 },
+      { "name": "Dinner", "cost": 28 }
+    ],
+    "transport": [
+      { "name": "SL Metro", "cost": 4 },
+      { "name": "Taxi", "cost": 25 },
+      { "name": "Bus", "cost": 3 }
+    ],
+    "sightseeing": [
+      { "name": "Malmo Museum", "cost": 20 },
+      { "name": "Gamla Stan", "cost": 0 },
+      { "name": "Techik Museum", "cost": 22 }
+    ]
+  },
+  "Germany": {
+    "currency": "€",
+    "food": [
+      { "name": "Bratwurst", "cost": 12 },
+      { "name": "Pretzel & Beer", "cost": 10 },
+      { "name": "German Dinner", "cost": 25 }
+    ],
+    "transport": [
+      { "name": "U-Bahn", "cost": 3 },
+      { "name": "Taxi", "cost": 22 },
+      { "name": "Train", "cost": 35 }
+    ],
+    "sightseeing": [
+      { "name": "Brandenburg Gate", "cost": 0 },
+      { "name": "Neuschwanstein Castle", "cost": 18 },
+      { "name": "Berlin Wall Memorial", "cost": 0 }
+    ]
+  }
+}

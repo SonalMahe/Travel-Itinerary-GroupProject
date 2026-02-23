@@ -1,190 +1,284 @@
 import inquirer from "inquirer";
 import chalk from "chalk";
-
-import { getAllDestinations } from "./services/destinationservices.js";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-import type { DestinationInfo } from "./services/destinationservices";
+import type { Trip, Activity, ActivityCategory } from "./models/index.js";
 import {
-  getIndiaInfo,
-  getFranceInfo,
-  getSwedenInfo,
-  getGermanyInfo,
-} from "./services/destinationservices";
+  addActivity,
+  calculateTotalCost,
+  removeActivity,
+  sortActivitiesByTime,
+} from "./services/itienaryservice.js";
+import {
+  getHighCostActivities,
+  getTotalsPerCategory,
+} from "./services/budget.js";
+import { getAllDestinations } from "./services/destinationservices.js";
+import activityData from "./db.json" with { type: "json" };
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
-const prompt = inquirer.createPromptModule();
+/* ─────────────────────────────────────────── */
+/* Activity Data */
+/* ─────────────────────────────────────────── */
 
-//types:
-type UserPreferences = {
-  favouriteCountry: string;
-  currency: string;
-  startDate: Date;
+type ActivityOption = {
+  name: string;
+  cost: number;
+  // startTime?: "morning" | "afternoon" | "evening";
 };
 
-type Database = {
-  userPreferences: UserPreferences;
+type CountryActivities = {
+  food: ActivityOption[];
+  transport: ActivityOption[];
+  sightseeing: ActivityOption[];
 };
 
-//DB file path
-const DB_PATH = path.join(__dirname, "..", "db.json");
+const db = activityData
 
-// ─── Load Preferences ─────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────── */
 
-const loadPreferences = (): UserPreferences => {
-  try {
-    if (fs.existsSync(DB_PATH)) {
-      const raw = fs.readFileSync(DB_PATH, "utf-8");
-      const db: Database = JSON.parse(raw);
-      return db.userPreferences;
-    }
-  } catch (error) {
-    console.log("Could not load preferences, using defaults.");
-  }
+let currentTrip: Trip | null = null;
 
-  // Default preferences if db.json doesn't exist yet
-  return {
-    favouriteCountry: "None",
-    currency: "None",
-    startDate: new Date("2024-12-12"),
-  };
-};
-
-// ─── Save Preferences ─────────────────────────────────────────────────────────
-
-const savePreferences = (prefs: UserPreferences): void => {
-  const db: Database = { userPreferences: prefs };
-  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
-  console.log("\n✅ Preferences saved!\n");
-};
-
-// ─── Display Country Info ─────────────────────────────────────────────────────
-
-const displayCountry = (info: DestinationInfo): void => {
-  console.log("\n─────────────────────────────────");
-  console.log(`${info.flag}  ${info.countryName}`);
-  console.log(`  Capital  : ${info.capital}`);
-  console.log(`  Currency : ${info.currency}`);
-  console.log(`  Region   : ${info.region}`);
-  console.log("─────────────────────────────────\n");
-};
-
-// ─── Country Menu ─────────────────────────────────────────────────────────────
-
-const countryMenu = async (): Promise<void> => {
-  const { country } = await prompt([
-    {
-      type: "rawlist",
-      name: "country",
-      message: "Which country do you want to see?",
-      choices: ["India", "France", "Sweden", "Germany", "Back"],
-    },
-  ]);
-
-  if (country === "Back") return;
-
-  console.log("\nFetching data...");
-
-  if (country === "All Countries") {
-    const all = await getAllDestinations();
-    all.forEach(displayCountry);
-    return;
-  }
-
-  const fetchers: Record<string, () => Promise<DestinationInfo>> = {
-    India: getIndiaInfo,
-    France: getFranceInfo,
-    Sweden: getSwedenInfo,
-    Germany: getGermanyInfo,
-  };
-
-  const info = await fetchers[country]();
-  displayCountry(info);
-};
-
-// ─── Preferences Menu ─────────────────────────────────────────────────────────
-
-const preferencesMenu = async (): Promise<void> => {
-  const current = loadPreferences();
-
-  console.log("\n── Current Preferences ──────────");
-  console.log(`  Favourite Country : ${current.favouriteCountry}`);
-  console.log(`  Currency          : ${current.currency}`);
-  console.log(`  Last Visited      : ${current.startDate}`);
-  console.log("─────────────────────────────────\n");
-
-  const { action } = await prompt([
-    {
-      type: "rawlist",
-      name: "action",
-      message: "What do you want to do?",
-      choices: ["Update Preferences", "Back"],
-    },
-  ]);
-
-  if (action === "Back") return;
-
-  const answers = await prompt([
-    {
-      type: "rawlist",
-      name: "favouriteCountry",
-      message: "Pick your favourite country:",
-      choices: ["India", "France", "Sweden", "Germany"],
-      default: current.favouriteCountry,
-    },
-    // {
-    //   type: "rawlist",
-    //   name: "currency",
-    //   message: "Pick your preferred currency:",
-    //   choices: ["INR", "EUR", "SEK"],
-    //   default: current.currency,
-    // },
-    {
-      type: "rawlist",
-      name: "startDate",
-      message: "Which country did you last visit?",
-      choices: ["India", "France", "Sweden", "Germany", "None"],
-      default: current.startDate,
-    },
-  ]);
-
-  savePreferences(answers);
-};
-
-// ─── Main Menu ────────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────── */
+/* Main Menu */
+/* ─────────────────────────────────────────── */
 
 const mainMenu = async (): Promise<void> => {
-  console.log("\n🌍 Welcome to the Travel Itinerary Manager\n");
+  let exit = false;
 
-  let running = true;
+  while (!exit) {
+    console.log(chalk.blue.bold("\n=== Travel Itinerary Manager ==="));
 
-  while (running) {
-    const { action } = await prompt([
+    const { action } = await inquirer.prompt<{ action: string }>([
       {
-        type: "rawlist",
+        type: "list",
         name: "action",
         message: "What would you like to do?",
-        choices: ["View Country Info", "My Preferences", "Exit"],
+        choices: [
+          "Create Trip",
+          "Add Activity",
+          "Remove Activity",
+          "View Activities",
+          "View Budget",
+          "View Destination Info",
+          "Exit",
+        ],
       },
     ]);
 
-    if (action === "View Country Info") {
-      await countryMenu();
-    } else if (action === "My Preferences") {
-      await preferencesMenu();
-    } else {
-      console.log("\n👋 Goodbye!\n");
-      running = false;
+    switch (action) {
+      case "Create Trip":
+        await createTrip();
+        break;
+      case "Add Activity":
+        await handleAddActivity();
+        break;
+      case "Remove Activity":
+        await handleRemoveActivity();
+        break;
+      case "View Activities":
+        viewActivities();
+        break;
+      case "Sort Activities by Time":
+        sortActivitiesByTime(currentTrip);
+        break;
+      case "View Budget":
+        viewBudget();
+        break;
+      case "View Destination Info":
+        await viewDestinationInfo();
+        break;
+      case "Exit":
+        exit = true;
+        console.log(chalk.green("Goodbye 👋"));
+        break;
     }
   }
 };
 
-// ─── Start ────────────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────── */
+
+const createTrip = async (): Promise<void> => {
+  const answers = await inquirer.prompt<{
+    destination: string;
+    startDate: string;
+  }>([
+    {
+      type: "list",
+      name: "destination",
+      message: "Select destination:",
+      choices: ["India", "France", "Sweden", "Germany"],
+    },
+    {
+      type: "input",
+      name: "startDate",
+      message: "Enter start date (YYYY-MM-DD):",
+      validate: (value: string) =>
+        /^\d{4}-\d{2}-\d{2}$/.test(value) ||
+        "Please enter a valid date (YYYY-MM-DD)",
+    },
+  ]);
+
+  currentTrip = {
+    id: Date.now().toString(),
+    destination: answers.destination,
+    startDate: new Date(answers.startDate),
+    activities: [],
+    currency: activityData[answers.destination].currency,
+  };
+
+  console.log(chalk.green("Trip created successfully!\n"));
+};
+
+/* ─────────────────────────────────────────── */
+
+const handleAddActivity = async (): Promise<void> => {
+  if (!currentTrip) {
+    console.log(chalk.red("Create a trip first.\n"));
+    return;
+  }
+  
+
+  const { category } = await inquirer.prompt<{ category: ActivityCategory }>([
+    {
+      type: "list",
+      name: "category",
+      message: "Select category:",
+      choices: ["food", "transport", "sightseeing"],
+    },
+  ]);
+
+  const options = activityData[currentTrip.destination][category];
+
+  const { selected } = await inquirer.prompt<{ selected: ActivityOption }>([
+    {
+      type: "list",
+      name: "selected",
+      message: "Choose activity:",
+      choices: options.map((o: any) => ({
+        name: `${o.name} (${currentTrip?.currency} ${o.cost})` ,
+        value: o,
+      })),
+    },
+  ]);
+
+  const { startTime } = await inquirer.prompt<{ startTime: string }>([
+    {
+      type: "input",
+      name: "startDate",
+      message: "Enter activity date (YYYY-MM-DD):",
+    },
+  ]);
+
+  const sortTripsByDate = (): void => {
+    if (!currentTrip) {
+      console.log(chalk.red("No trip available.\n"));
+      return;
+    }
+  };
+
+  const activity: Activity = {
+    id: Date.now().toString(),
+    name: selected.name,
+    cost: selected.cost,
+    category,
+    startTime: new Date(startTime),
+  };
+
+  currentTrip = addActivity(currentTrip, activity);
+
+  console.log(chalk.green("Activity added successfully!\n"));
+};
+
+/* ─────────────────────────────────────────── */
+
+const handleRemoveActivity = async (): Promise<void> => {
+  if (!currentTrip || currentTrip.activities.length === 0) {
+    console.log(chalk.red("No activities to remove.\n"));
+    return;
+  }
+
+  const { activityId } = await inquirer.prompt<{ activityId: string }>([
+    {
+      type: "list",
+      name: "activityId",
+      message: "Select activity to remove:",
+      choices: currentTrip.activities.map((activity) => ({
+        name: `${activity.name} (€${activity.cost})`,
+        value: activity.id,
+      })),
+    },
+  ]);
+
+  currentTrip = removeActivity(currentTrip, activityId);
+
+  console.log(chalk.green("Activity removed successfully!\n"));
+};
+
+/* ─────────────────────────────────────────── */
+
+const viewActivities = (): void => {
+  if (!currentTrip || currentTrip.activities.length === 0) {
+    console.log(chalk.red("No activities available.\n"));
+    return;
+  }
+
+  console.log(chalk.yellow("\nYour Activities:\n"));
+
+  currentTrip.activities.forEach((activity, index) => {
+    console.log(
+      `${index + 1}. ${chalk.cyan(activity.name)} | ${activity.category} | €${activity.cost}`,
+    );
+  });
+
+  console.log("");
+};
+
+// const sortTripsByDate = (): void => {
+//   if (!currentTrip) {
+//     console.log(chalk.red("No trip available.\n"));
+//     return;
+//   }
+// };
+/* ─────────────────────────────────────────── */
+
+const viewBudget = (): void => {
+  if (!currentTrip) {
+    console.log(chalk.red("No trip available.\n"));
+    return;
+  }
+
+  const total = calculateTotalCost(currentTrip);
+  const highCost = getHighCostActivities(currentTrip, 50);
+  const totalsPerCategory = getTotalsPerCategory(currentTrip);
+
+  console.log(chalk.magenta("\nBudget Overview"));
+  console.log(`Total Cost: ${total}`);
+
+  console.log("\nHigh Cost Activities (>50):");
+  highCost.forEach((a: Activity) => console.log(a.name));
+
+  console.log("\nTotals Per Category:");
+  console.log(totalsPerCategory);
+};
+
+/* ─────────────────────────────────────────── */
+
+const viewDestinationInfo = async (): Promise<void> => {
+  try {
+    const destinations = await getAllDestinations();
+
+    console.log(chalk.blue("\nDestination Information:\n"));
+    destinations.forEach((d) => {
+      console.log(
+        `${chalk.green(d.countryName)} | Capital: ${d.capital} | Currency: ${d.currency} | Region: ${d.region}`,
+      );
+    });
+  } catch {
+    console.log(chalk.red("Failed to fetch destination data."));
+  }
+};
+
+/* ─────────────────────────────────────────── */
 
 mainMenu().catch((error: Error) => {
-  console.error(chalk.red("Something went wrong:", error.message));
+  console.error(chalk.red(error.message));
 });
