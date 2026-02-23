@@ -25,13 +25,11 @@ type ActivityOption = {
   // startTime?: "morning" | "afternoon" | "evening";
 };
 
-type CountryActivities = {
-  food: ActivityOption[];
-  transport: ActivityOption[];
-  sightseeing: ActivityOption[];
-};
-
-const db = activityData
+// type CountryActivities = {
+//   food: ActivityOption[];
+//   transport: ActivityOption[];
+//   sightseeing: ActivityOption[];
+// };
 
 /* ─────────────────────────────────────────── */
 
