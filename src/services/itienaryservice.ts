@@ -1,12 +1,12 @@
-import type { Trip, Activity } from "../models/index.js";
+import type { Trip, Activity, ActivityCategory } from "../models/index.js";
 
-// Manages trip itineraries, including adding/removing activities and calculating total costs.
+// add an activity to a trip
 export const addActivity = (trip: Trip, activity: Activity): Trip => {
   trip.activities.push(activity);
   return trip;
 };
 
-// Removes an activity from the trip itinerary based on the activity ID.
+// remove an activity from a trip
 export const removeActivity = (trip: Trip, activityId: string): Trip => {
   trip.activities = trip.activities.filter(
     (activity) => activity.id !== activityId,
@@ -14,41 +14,39 @@ export const removeActivity = (trip: Trip, activityId: string): Trip => {
   return trip;
 };
 
-// Calculates the total cost of all activities in the trip itinerary.
-export const calculateTotalCost = (trip: Trip): number => {
-  return trip.activities.reduce((sum, activity) => sum + activity.cost, 0);
-};
+// export const calculateTotalCost = (trip: Trip): number => {
+//   return trip.activities.reduce((sum, activity) => sum + activity.cost, 0);
+// };
 
-console.log(
-  "\nItinerary service functions have been implemented successfully.\n",
-);
+// export const getActivitiesByCategory = (
+//   trip: Trip,
+//   category: Activity["category"],
+// ): Activity[] => {
+//   return trip.activities.filter((activity) => activity.category === category);
+// };
 
-// Filters activities in the trip itinerary by a specified category.
-export const getActivitiesByCategory = (
-  trip: Trip,
-  category: Activity["category"],
-): Activity[] => {
-  return trip.activities.filter((activity) => activity.category === category);
-};
+// export const sortActivitiesByTime = (trip: Trip): Activity[] => {
+//   return trip.activities.sort(
+//     (a, b) => a.startTime.getTime() - b.startTime.getTime(),
+//   );
+// };
 
-// Sorts activities in the trip itinerary by their start time in ascending order.
-export const sortActivitiesByTime = (trip: Trip): Activity[] => {
-  return trip.activities.sort(
-    (a, b) => a.startTime.getTime() - b.startTime.getTime(),
-  );
-};
-
-// Sorts trips by their start date in ascending order.
+// sort trips by start date
 export const sortTripsByDate = (trips: Trip[]): Trip[] => {
   return trips.sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
 };
 
-console.log(
-  "\nAdditional itinerary service functions (filtering and sorting) have been implemented successfully.\n",
-);
+// sort activities by weekday and time
+export const sortActivitiesByWeekdayAndTime = (trip: Trip): Activity[] => {
+  return trip.activities.sort((a, b) => {
+    const dayA = a.startTime.getDay(); // 0 = Sunday
+    const dayB = b.startTime.getDay();
 
-// This PR adds the itinerary service with core functions:
-// - Add activity to trip
-// - Remove activity from trip
-// - Calculate total cost of activities in the trip
-// - Filter activities by category
+    if (dayA !== dayB) {
+      return dayA - dayB; // sort by weekday
+    }
+
+    // If same weekday → sort by time
+    return a.startTime.getTime() - b.startTime.getTime();
+  });
+};

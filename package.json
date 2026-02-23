@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "start": "ts-node src/cli.ts"
   },
   "repository": {
     "type": "git",
@@ -22,10 +23,15 @@
   "homepage": "https://github.com/SonalMahe/Travel-Itinerary-GroupProject#readme",
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@types/inquirer": "^9.0.9",
+    "@types/node": "^25.3.0",
     "eslint": "^9.39.2",
     "globals": "^17.3.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.55.0"
+  },
+  "dependencies": {
+    "inquirer": "^13.2.5"
   }
 }
