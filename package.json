@@ -2,7 +2,7 @@
   "name": "travel-itinerary-project",
   "version": "1.0.0",
   "description": "CLI application",
-  "main": "index.js",
+  "main": "src/cli.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
@@ -28,6 +28,7 @@
     "eslint": "^9.39.2",
     "globals": "^17.3.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.55.0"
   },

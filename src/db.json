@@ -1,0 +1,167 @@
+{
+  "India": {
+    "currency": "₹",
+    "food": [
+      { "name": "Briyani", "cost": 100 },
+      { "name": "Masala Dosa", "cost": 80 },
+      { "name": "Thai Curry", "cost": 20 }
+    ],
+    "transport": [
+      { "name": "Bus", "cost": 15 },
+      { "name": "Metro Ride", "cost": 30 },
+      { "name": "Taxi", "cost": 100 }
+    ],
+    "sightseeing": [
+      { "name": "Taj Mahal", "cost": 200 },
+      { "name": "Red Fort", "cost": 100 },
+      { "name": "Jaipur Palace", "cost": 120 }
+    ],
+    "accommodation": [
+      { "name": "Budget Hotel", "cost": 1500 },
+      { "name": "3-Star Hotel", "cost": 3000 },
+      { "name": "Luxury Hotel", "cost": 8000 }
+    ]
+  },
+  "France": {
+    "currency": "€",
+    "food": [
+      { "name": "Croissant & Coffee", "cost": 10 },
+      { "name": "French Dinner", "cost": 35 },
+      { "name": "Macarons", "cost": 12 }
+    ],
+    "transport": [
+      { "name": "Paris Metro", "cost": 4 },
+      { "name": "Taxi", "cost": 20 },
+      { "name": "Train Ticket", "cost": 30 }
+    ],
+    "sightseeing": [
+      { "name": "Eiffel Tower", "cost": 25 },
+      { "name": "Louvre Museum", "cost": 30 },
+      { "name": "Seine River Cruise", "cost": 40 }
+    ],
+    "accommodation": [
+      { "name": "Hostel", "cost": 40 },
+      { "name": "3-Star Hotel", "cost": 120 },
+      { "name": "Luxury Hotel", "cost": 350 }
+    ]
+  },
+  "Sweden": {
+    "currency": "kr",
+    "food": [
+      { "name": "Swedish Meatballs", "cost": 18 },
+      { "name": "Fika", "cost": 9 },
+      { "name": "Dinner", "cost": 28 }
+    ],
+    "transport": [
+      { "name": "SL Metro", "cost": 4 },
+      { "name": "Taxi", "cost": 25 },
+      { "name": "Bus", "cost": 3 }
+    ],
+    "sightseeing": [
+      { "name": "Malmo Museum", "cost": 20 },
+      { "name": "Gamla Stan", "cost": 0 },
+      { "name": "Techik Museum", "cost": 22 }
+    ],
+    "accommodation": [
+      { "name": "Hostel", "cost": 350 },
+      { "name": "City Hotel", "cost": 1200 },
+      { "name": "Luxury Waterfront Hotel", "cost": 2500 }
+    ]
+  },
+  "Germany": {
+    "currency": "€",
+    "food": [
+      { "name": "Bratwurst", "cost": 12 },
+      { "name": "Pretzel & Beer", "cost": 10 },
+      { "name": "German Dinner", "cost": 25 }
+    ],
+    "transport": [
+      { "name": "U-Bahn", "cost": 3 },
+      { "name": "Taxi", "cost": 22 },
+      { "name": "Train", "cost": 35 }
+    ],
+    "sightseeing": [
+      { "name": "Brandenburg Gate", "cost": 0 },
+      { "name": "Neuschwanstein Castle", "cost": 18 },
+      { "name": "Berlin Wall Memorial", "cost": 0 }
+    ],
+    "accommodation": [
+      { "name": "Hostel", "cost": 35 },
+      { "name": "3-Star Hotel", "cost": 110 },
+      { "name": "Luxury Hotel", "cost": 280 }
+    ]
+  },
+
+  "Italy": {
+  "currency": "€",
+  "food": [
+    { "name": "Pizza Margherita", "cost": 15 },
+    { "name": "Pasta Carbonara", "cost": 18 },
+    { "name": "Gelato", "cost": 6 }
+  ],
+  "transport": [
+    { "name": "Rome Metro", "cost": 3 },
+    { "name": "Train Ticket", "cost": 25 },
+    { "name": "Taxi", "cost": 20 }
+  ],
+  "sightseeing": [
+    { "name": "Colosseum", "cost": 20 },
+    { "name": "Leaning Tower of Pisa", "cost": 18 },
+    { "name": "Vatican Museum", "cost": 25 }
+  ],
+  "accommodation": [
+    { "name": "3-Star Hotel", "cost": 90 },
+    { "name": "Luxury Hotel", "cost": 220 },
+    { "name": "Hostel", "cost": 35 }
+  ]
+},
+
+"Spain": {
+  "currency": "€",
+  "food": [
+    { "name": "Paella", "cost": 20 },
+    { "name": "Tapas", "cost": 15 },
+    { "name": "Churros", "cost": 7 }
+  ],
+  "transport": [
+    { "name": "Madrid Metro", "cost": 3 },
+    { "name": "Train", "cost": 30 },
+    { "name": "Taxi", "cost": 22 }
+  ],
+  "sightseeing": [
+    { "name": "Sagrada Familia", "cost": 26 },
+    { "name": "Park Güell", "cost": 15 },
+    { "name": "Alhambra", "cost": 18 }
+  ],
+  "accommodation": [
+    { "name": "Boutique Hotel", "cost": 110 },
+    { "name": "Luxury Resort", "cost": 250 },
+    { "name": "Hostel", "cost": 40 }
+  ]
+},
+
+"Japan": {
+  "currency": "¥",
+  "food": [
+    { "name": "Sushi", "cost": 25 },
+    { "name": "Ramen", "cost": 12 },
+    { "name": "Tempura", "cost": 18 }
+  ],
+  "transport": [
+    { "name": "Shinkansen", "cost": 80 },
+    { "name": "Tokyo Metro", "cost": 5 },
+    { "name": "Taxi", "cost": 35 }
+  ],
+  "sightseeing": [
+    { "name": "Mount Fuji Tour", "cost": 50 },
+    { "name": "Fushimi Inari Shrine", "cost": 0 },
+    { "name": "Tokyo Skytree", "cost": 20 }
+  ],
+  "accommodation": [
+    { "name": "Capsule Hotel", "cost": 45 },
+    { "name": "Ryokan", "cost": 150 },
+    { "name": "Luxury Hotel", "cost": 300 }
+  ]
+}
+
+}
