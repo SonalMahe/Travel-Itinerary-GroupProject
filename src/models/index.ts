@@ -14,8 +14,8 @@ export type Activity = {
 };
 
 export type Trip = {
-  name: any;
   id: string;
+  name: any;
   destination: string;
   startDate: Date;
   endDate?: Date;

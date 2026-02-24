@@ -18,12 +18,12 @@ export const removeActivity = (trip: Trip, activityId: string): Trip => {
 //   return trip.activities.reduce((sum, activity) => sum + activity.cost, 0);
 // };
 
-// export const getActivitiesByCategory = (
-//   trip: Trip,
-//   category: Activity["category"],
-// ): Activity[] => {
-//   return trip.activities.filter((activity) => activity.category === category);
-// };
+export const getActivitiesByCategory = (
+  trip: Trip,
+  category: Activity["category"],
+): Activity[] => {
+  return trip.activities.filter((activity) => activity.category === category);
+};
 
 // export const sortActivitiesByTime = (trip: Trip): Activity[] => {
 //   return trip.activities.sort(
@@ -37,16 +37,30 @@ export const sortTripsByDate = (trips: Trip[]): Trip[] => {
 };
 
 // sort activities by weekday and time
-export const sortActivitiesByWeekdayAndTime = (trip: Trip): Activity[] => {
-  return trip.activities.sort((a, b) => {
-    const dayA = a.startTime.getDay(); // 0 = Sunday
-    const dayB = b.startTime.getDay();
+// export const sortActivitiesByWeekdayAndTime = (trip: Trip): Activity[] => {
+//   return trip.activities.sort((a, b) => {
+//     const dayA = a.startTime.getDay(); // 0 = Sunday
+//     const dayB = b.startTime.getDay();
 
-    if (dayA !== dayB) {
-      return dayA - dayB; // sort by weekday
-    }
+//     if (dayA !== dayB) {
+//       return dayA - dayB; // sort by weekday
+//     }
 
-    // If same weekday → sort by time
-    return a.startTime.getTime() - b.startTime.getTime();
+//     // If same weekday → sort by time
+//     return a.startTime.getTime() - b.startTime.getTime();
+//   });
+// };
+
+export const sortActivitiesByWeekday = (trip: Trip): Activity[] => {
+  return [...trip.activities].sort((a, b) => {
+    const getWeekday = (date: Date) => {
+      const day = new Date(date).getDay();
+      return day === 0 ? 7 : day; // Sunday becomes 7
+    };
+
+    const dayA = getWeekday(a.startTime);
+    const dayB = getWeekday(b.startTime);
+
+    return dayA - dayB; // Only sort by weekday
   });
 };
