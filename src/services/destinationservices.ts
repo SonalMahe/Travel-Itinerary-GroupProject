@@ -23,11 +23,11 @@ export const getDestinationInfo = async (country: string): Promise <DestinationI
     const countryData = data[0];
 
     const currencies = countryData.currencies;
-    const firstCurrency : any = Object.values(currencies)[0];
+    const firstCurrency : any = Object.values(currencies)[0];   //It converts an object into an array of its values.
 
     return {
       countryName: countryData.name.common,
-      capital: countryData.capital?.[0] || "N/A",
+      capital: countryData.capital?.[0],
       currency: firstCurrency.name,
       flag: countryData.flag,
       region: countryData.region,
