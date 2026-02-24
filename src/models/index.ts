@@ -3,7 +3,7 @@ export type ActivityCategory =
   | "transport"
   | "sightseeing"
   | "accommodation";
-
+ 
 export type Activity = {
   id: string;
   name: string;
@@ -12,7 +12,7 @@ export type Activity = {
   startTime: Date;
   endTime: Date;
 };
-
+ 
 export type Trip = {
   id: string;
   name: any;
@@ -20,4 +20,5 @@ export type Trip = {
   startDate: Date;
   endDate?: Date;
   activities: Activity[];
+  currency: string;
 };
