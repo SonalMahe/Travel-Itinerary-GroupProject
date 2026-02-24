@@ -1,49 +1,37 @@
 import inquirer from "inquirer";
 import chalk from "chalk";
 import type { Trip, Activity, ActivityCategory } from "./models/index.js";
+
 import {
   addActivity,
-  calculateTotalCost,
   removeActivity,
-  sortActivitiesByTime,
+  sortActivitiesByWeekday,
+  getActivitiesByCategory,
 } from "./services/itienaryservice.js";
+
 import {
+  getTotalTripCost,
   getHighCostActivities,
   getTotalsPerCategory,
 } from "./services/budget.js";
-import { getAllDestinations } from "./services/destinationservices.js";
+
+import { getDestinationInfo } from "./services/destinationservices.js";
+import type { DestinationInfo } from "./services/destinationservices.js";
 import activityData from "./db.json" with { type: "json" };
 
-
-/* ─────────────────────────────────────────── */
-/* Activity Data */
-/* ─────────────────────────────────────────── */
-
-type ActivityOption = {
-  name: string;
-  cost: number;
-  // startTime?: "morning" | "afternoon" | "evening";
-};
-
-// type CountryActivities = {
-//   food: ActivityOption[];
-//   transport: ActivityOption[];
-//   sightseeing: ActivityOption[];
-// };
-
-/* ─────────────────────────────────────────── */
+type ActivityOption = { name: string; cost: number };
 
 let currentTrip: Trip | null = null;
 
 /* ─────────────────────────────────────────── */
-/* Main Menu */
+/* MAIN MENU */
 /* ─────────────────────────────────────────── */
 
 const mainMenu = async (): Promise<void> => {
   let exit = false;
 
   while (!exit) {
-    console.log(chalk.blue.bold("\n=== Travel Itinerary Manager ==="));
+    console.log(chalk.blue.bold("\n======= Travel Itinerary Manager ======="));
 
     const { action } = await inquirer.prompt<{ action: string }>([
       {
@@ -54,7 +42,8 @@ const mainMenu = async (): Promise<void> => {
           "Create Trip",
           "Add Activity",
           "Remove Activity",
-          "View Activities",
+          "View Activities (Grouped by Day)",
+          "View Activities by Category",
           "View Budget",
           "View Destination Info",
           "Exit",
@@ -72,11 +61,11 @@ const mainMenu = async (): Promise<void> => {
       case "Remove Activity":
         await handleRemoveActivity();
         break;
-      case "View Activities":
-        viewActivities();
+      case "View Activities (Grouped by Day)":
+        viewActivitiesGrouped();
         break;
-      case "Sort Activities by Time":
-        sortActivitiesByTime(currentTrip);
+      case "View Activities by Category":
+        await viewActivitiesByCategory();
         break;
       case "View Budget":
         viewBudget();
@@ -93,25 +82,39 @@ const mainMenu = async (): Promise<void> => {
 };
 
 /* ─────────────────────────────────────────── */
+/* CREATE TRIP */
+/* ─────────────────────────────────────────── */
 
 const createTrip = async (): Promise<void> => {
   const answers = await inquirer.prompt<{
     destination: string;
     startDate: string;
+    endDate: string;
   }>([
     {
       type: "list",
       name: "destination",
       message: "Select destination:",
-      choices: ["India", "France", "Sweden", "Germany"],
+      choices: Object.keys(activityData),
     },
     {
       type: "input",
       name: "startDate",
-      message: "Enter start date (YYYY-MM-DD):",
-      validate: (value: string) =>
-        /^\d{4}-\d{2}-\d{2}$/.test(value) ||
-        "Please enter a valid date (YYYY-MM-DD)",
+      message: "Start date (YYYY-MM-DD):",
+      default: new Date().toISOString().split("T")[0],
+      validate: (value) =>
+        /^\d{4}-\d{2}-\d{2}$/.test(value) || "Invalid date format",
+    },
+    {
+      type: "input",
+      name: "endDate",
+      message: "End date (YYYY-MM-DD):",
+      default: new Date().toISOString().split("T")[0],
+      validate: (value, answers) =>
+        /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+        new Date(value) >= new Date(answers.startDate)
+          ? true
+          : "End date must be after start date",
     },
   ]);
 
@@ -119,13 +122,16 @@ const createTrip = async (): Promise<void> => {
     id: Date.now().toString(),
     destination: answers.destination,
     startDate: new Date(answers.startDate),
+    endDate: new Date(answers.endDate),
     activities: [],
     currency: activityData[answers.destination].currency,
   };
 
-  console.log(chalk.green("Trip created successfully!\n"));
+  console.log(chalk.green("\nTrip created successfully!\n"));
 };
 
+/* ─────────────────────────────────────────── */
+/* ADD ACTIVITY */
 /* ─────────────────────────────────────────── */
 
 const handleAddActivity = async (): Promise<void> => {
@@ -133,14 +139,13 @@ const handleAddActivity = async (): Promise<void> => {
     console.log(chalk.red("Create a trip first.\n"));
     return;
   }
-  
 
   const { category } = await inquirer.prompt<{ category: ActivityCategory }>([
     {
       type: "list",
       name: "category",
       message: "Select category:",
-      choices: ["food", "transport", "sightseeing"],
+      choices: ["food", "transport", "sightseeing", "accommodation"],
     },
   ]);
 
@@ -151,34 +156,42 @@ const handleAddActivity = async (): Promise<void> => {
       type: "list",
       name: "selected",
       message: "Choose activity:",
-      choices: options.map((o: any) => ({
-        name: `${o.name} (${currentTrip?.currency} ${o.cost})` ,
+      choices: options.map((o: ActivityOption) => ({
+        name: `${o.name} (${currentTrip?.currency} ${o.cost})`,
         value: o,
       })),
     },
   ]);
 
-  const { startTime } = await inquirer.prompt<{ startTime: string }>([
+  const { dateInput } = await inquirer.prompt<{ dateInput: string }>([
     {
       type: "input",
-      name: "startDate",
+      name: "dateInput",
       message: "Enter activity date (YYYY-MM-DD):",
+      validate: (value) =>
+        /^\d{4}-\d{2}-\d{2}$/.test(value) || "Format must be YYYY-MM-DD",
     },
   ]);
 
-  const sortTripsByDate = (): void => {
-    if (!currentTrip) {
-      console.log(chalk.red("No trip available.\n"));
-      return;
-    }
-  };
+  const activityDate = new Date(dateInput);
+
+  if (
+    activityDate < currentTrip.startDate ||
+    activityDate > currentTrip.endDate
+  ) {
+    console.log(
+      chalk.red("Activity must be within trip start and end date.\n"),
+    );
+    return;
+  }
 
   const activity: Activity = {
     id: Date.now().toString(),
     name: selected.name,
     cost: selected.cost,
     category,
-    startTime: new Date(startTime),
+    startTime: activityDate,
+    endTime: activityDate,
   };
 
   currentTrip = addActivity(currentTrip, activity);
@@ -186,6 +199,8 @@ const handleAddActivity = async (): Promise<void> => {
   console.log(chalk.green("Activity added successfully!\n"));
 };
 
+/* ─────────────────────────────────────────── */
+/* REMOVE ACTIVITY */
 /* ─────────────────────────────────────────── */
 
 const handleRemoveActivity = async (): Promise<void> => {
@@ -199,9 +214,9 @@ const handleRemoveActivity = async (): Promise<void> => {
       type: "list",
       name: "activityId",
       message: "Select activity to remove:",
-      choices: currentTrip.activities.map((activity) => ({
-        name: `${activity.name} (€${activity.cost})`,
-        value: activity.id,
+      choices: currentTrip.activities.map((a) => ({
+        name: `${a.name} (${currentTrip?.currency} ${a.cost})`,
+        value: a.id,
       })),
     },
   ]);
@@ -212,30 +227,77 @@ const handleRemoveActivity = async (): Promise<void> => {
 };
 
 /* ─────────────────────────────────────────── */
+/* VIEW GROUPED ACTIVITIES BY WEEKDAY */
+/* ─────────────────────────────────────────── */
 
-const viewActivities = (): void => {
+const viewActivitiesGrouped = (): void => {
   if (!currentTrip || currentTrip.activities.length === 0) {
     console.log(chalk.red("No activities available.\n"));
     return;
   }
 
-  console.log(chalk.yellow("\nYour Activities:\n"));
+  const sorted = sortActivitiesByWeekday(currentTrip);
 
-  currentTrip.activities.forEach((activity, index) => {
+  const grouped: Record<string, Activity[]> = {};
+
+  sorted.forEach((activity) => {
+    const day = activity.startTime.toDateString();
+    if (!grouped[day]) grouped[day] = [];
+    grouped[day].push(activity);
+  });
+
+  console.log(chalk.yellow("\nActivities by Day:\n"));
+
+  Object.keys(grouped).forEach((day) => {
+    console.log(chalk.blue.bold(day));
+    grouped[day].forEach((activity) => {
+      console.log(
+        `- ${chalk.cyan(activity.name)} | ${activity.category} | ${currentTrip?.currency} ${activity.cost}`,
+      );
+    });
+    console.log("");
+  });
+};
+
+/* ─────────────────────────────────────────── */
+/* VIEW ACTIVITIES BY CATEGORY */
+/* ─────────────────────────────────────────── */
+
+const viewActivitiesByCategory = async (): Promise<void> => {
+  if (!currentTrip || currentTrip.activities.length === 0) {
+    console.log(chalk.red("No activities available.\n"));
+    return;
+  }
+
+  const { category } = await inquirer.prompt<{ category: ActivityCategory }>([
+    {
+      type: "list",
+      name: "category",
+      message: "Select category:",
+      choices: ["food", "transport", "sightseeing", "accommodation"],
+    },
+  ]);
+
+  const activities = getActivitiesByCategory(currentTrip, category);
+
+  if (activities.length === 0) {
+    console.log(chalk.yellow("No activities in this category.\n"));
+    return;
+  }
+
+  console.log(chalk.blue(`\n${category.toUpperCase()} Activities:\n`));
+
+  activities.forEach((activity) => {
     console.log(
-      `${index + 1}. ${chalk.cyan(activity.name)} | ${activity.category} | €${activity.cost}`,
+      `- ${activity.name} | ${currentTrip?.currency} ${activity.cost}`,
     );
   });
 
   console.log("");
 };
 
-// const sortTripsByDate = (): void => {
-//   if (!currentTrip) {
-//     console.log(chalk.red("No trip available.\n"));
-//     return;
-//   }
-// };
+/* ─────────────────────────────────────────── */
+/* VIEW BUDGET */
 /* ─────────────────────────────────────────── */
 
 const viewBudget = (): void => {
@@ -244,35 +306,52 @@ const viewBudget = (): void => {
     return;
   }
 
-  const total = calculateTotalCost(currentTrip);
-  const highCost = getHighCostActivities(currentTrip, 50);
+  const total = getTotalTripCost(currentTrip);
+  const highCost = getHighCostActivities(currentTrip, 100);
   const totalsPerCategory = getTotalsPerCategory(currentTrip);
 
-  console.log(chalk.magenta("\nBudget Overview"));
-  console.log(`Total Cost: ${total}`);
+  console.log(chalk.magenta("\n======= Budget Overview =======\n"));
 
-  console.log("\nHigh Cost Activities (>50):");
-  highCost.forEach((a: Activity) => console.log(a.name));
+  console.log(
+    chalk.green(`Total Trip Cost: ${currentTrip.currency} ${total}\n`),
+  );
 
-  console.log("\nTotals Per Category:");
+  console.log(chalk.red("High Cost Activities (>100):"));
+  highCost.forEach((a) =>
+    console.log(`- ${a.name} (${currentTrip?.currency} ${a.cost})`),
+  );
+
+  console.log("\nCategory Totals:");
   console.log(totalsPerCategory);
+
+  console.log("");
 };
 
+/* VIEW DESTINATION INFO (API */
 /* ─────────────────────────────────────────── */
 
 const viewDestinationInfo = async (): Promise<void> => {
-  try {
-    const destinations = await getAllDestinations();
-
-    console.log(chalk.blue("\nDestination Information:\n"));
-    destinations.forEach((d) => {
-      console.log(
-        `${chalk.green(d.countryName)} | Capital: ${d.capital} | Currency: ${d.currency} | Region: ${d.region}`,
-      );
-    });
-  } catch {
-    console.log(chalk.red("Failed to fetch destination data."));
+  if (!currentTrip) {
+    console.log(chalk.red("Create a trip first.\n"));
+    return;
   }
+
+  const country = currentTrip.destination;
+
+  // Fetch live info from API
+  const info: DestinationInfo | null = await getDestinationInfo(country);
+
+  if (!info) {
+    console.log(chalk.red("Could not fetch country info.\n"));
+    return;
+  }
+
+  console.log(chalk.yellow("\nDestination Information:\n"));
+  console.log(`Country: ${chalk.green(info.countryName)}`);
+  console.log(`Capital: ${info.capital}`);
+  console.log(`Currency: ${info.currency}`);
+  console.log(`Region: ${info.region}`);
+  console.log(`Flag: ${info.flag}\n`);
 };
 
 /* ─────────────────────────────────────────── */
