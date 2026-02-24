@@ -11,12 +11,12 @@ export const getTotalTripCost = (trip: Trip): number => {
 // I want to filler activities by category like(food transport sightseeing)
 // so that i can easily find specific types of activites.
 
-export const getActivitiesByCategory = (
+/*export const getActivitiesByCategory = (
   trip: Trip,
   category: ActivityCategory,
 ): Activity[] => {
   return trip.activities.filter((a) => a.category === category);
-};
+};*/
 
 // i want to  identify  heigh cost activities that exceed
 // a certain threshold so that i can review my expenses.
