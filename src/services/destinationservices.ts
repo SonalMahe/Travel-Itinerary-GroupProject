@@ -1,40 +1,49 @@
 // src/services/destinationservices.ts
 // This service fetches destination information from the REST Countries API
 // It provides details like country name, capital, currency, flag, and region
-// The getDestinationInfo function takes a country name as input and returns a Promise that resolves to a DestinationInfo object or null if the country is not found
-//example- India, France, Japan, italy, spain, sweden, germany
 
 export type DestinationInfo = {
   countryName: string;
   capital: string;
-  currency: string;
+  currencyName: string;
+  currencySymbol: string;
   flag: string;
   region: string;
 };
 
-export const getDestinationInfo = async (country: string): Promise <DestinationInfo | null> => {
+export const getDestinationInfo = async (country: string): Promise<DestinationInfo | null> => {
   try {
-    const response = await fetch(`https://restcountries.com/v3.1/name/${country}?fullText=true`);
+    const response = await fetch(
+      `https://restcountries.com/v3.1/name/${encodeURIComponent(country)}`
+    
+    );
 
     if (!response.ok) {
-      throw new Error("Country not found");
+      return null;
     }
-    const data = await response.json();
-    const countryData = data[0];
+    const data = (await response.json()) as Record<string, unknown>[];
+    const countryData = data[0] as Record<string, unknown>;
 
-    const currencies = countryData.currencies;
-    const firstCurrency : any = Object.values(currencies)[0];   //It converts an object into an array of its values.
+    const currencies = countryData.currencies as Record<
+      string,
+      { name: string; symbol: string }
+    >;
+    const firstCurrency = Object.values(currencies)[0];
+
+    const nameObj = countryData.name as { common: string };
+    const capitalArr = countryData.capital as string[] | undefined;
 
     return {
-      countryName: countryData.name.common,
-      capital: countryData.capital?.[0],
-      currency: firstCurrency.name,
-      flag: countryData.flag,
-      region: countryData.region,
+      countryName: nameObj.common,
+      capital: capitalArr?.[0] ?? "N/A",
+      currencyName: firstCurrency.name,
+      currencySymbol: firstCurrency.symbol ?? "$",
+      flag: countryData.flag as string,
+      region: countryData.region as string,
     };
 
   } catch (error) {
-    console.log("Error fetching destination info:", error);
+    console.error("Error fetching destination info:", (error as Error).message);
     return null;
   }
 };
