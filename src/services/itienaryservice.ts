@@ -1,66 +1,55 @@
 import type { Trip, Activity, ActivityCategory } from "../models/index.js";
 
-// add an activity to a trip
+// Add an activity to a trip
 export const addActivity = (trip: Trip, activity: Activity): Trip => {
   trip.activities.push(activity);
   return trip;
 };
 
-// remove an activity from a trip
+// Remove an activity from a trip by ID
 export const removeActivity = (trip: Trip, activityId: string): Trip => {
-  trip.activities = trip.activities.filter(
-    (activity) => activity.id !== activityId,
-  );
+  trip.activities = trip.activities.filter((a) => a.id !== activityId);
   return trip;
 };
 
-// export const calculateTotalCost = (trip: Trip): number => {
-//   return trip.activities.reduce((sum, activity) => sum + activity.cost, 0);
-// };
-
+// Filter activities by category
 export const getActivitiesByCategory = (
   trip: Trip,
-  category: Activity["category"],
+  category: ActivityCategory
 ): Activity[] => {
-  return trip.activities.filter((activity) => activity.category === category);
+  return trip.activities.filter((a) => a.category === category);
 };
 
-// export const sortActivitiesByTime = (trip: Trip): Activity[] => {
-//   return trip.activities.sort(
-//     (a, b) => a.startTime.getTime() - b.startTime.getTime(),
-//   );
-// };
-
-// sort trips by start date
-export const sortTripsByDate = (trips: Trip[]): Trip[] => {
-  return trips.sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+// Get activities for a specific day (YYYY-MM-DD)
+export const getActivitiesForDay = (
+  trip: Trip,
+  date: string
+): Activity[] => {
+  return trip.activities.filter((a) => a.date === date);
 };
 
-// sort activities by weekday and time
-// export const sortActivitiesByWeekdayAndTime = (trip: Trip): Activity[] => {
-//   return trip.activities.sort((a, b) => {
-//     const dayA = a.startTime.getDay(); // 0 = Sunday
-//     const dayB = b.startTime.getDay();
-
-//     if (dayA !== dayB) {
-//       return dayA - dayB; // sort by weekday
-//     }
-
-//     // If same weekday → sort by time
-//     return a.startTime.getTime() - b.startTime.getTime();
-//   });
-// };
-
-export const sortActivitiesByWeekday = (trip: Trip): Activity[] => {
+// Sort activities chronologically by date
+export const sortActivitiesChronologically = (trip: Trip): Activity[] => {
   return [...trip.activities].sort((a, b) => {
-    const getWeekday = (date: Date) => {
-      const day = new Date(date).getDay();
-      return day === 0 ? 7 : day; // Sunday becomes 7
-    };
-
-    const dayA = getWeekday(a.startTime);
-    const dayB = getWeekday(b.startTime);
-
-    return dayA - dayB; // Only sort by weekday
+    return new Date(a.date).getTime() - new Date(b.date).getTime();
   });
+};
+
+// Group activities by day
+export const groupActivitiesByDay = (
+  trip: Trip
+): Record<string, Activity[]> => {
+  const grouped: Record<string, Activity[]> = {};
+
+  const sorted = sortActivitiesChronologically(trip);
+
+  for (const activity of sorted) {
+    const day = activity.date;
+    if (!grouped[day]) {
+      grouped[day] = [];
+    }
+    grouped[day].push(activity);
+  }
+
+  return grouped;
 };
