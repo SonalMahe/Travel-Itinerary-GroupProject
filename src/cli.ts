@@ -168,7 +168,7 @@ const createTrip = async (): Promise<void> => {
   ]);
 
   // Fetch destination info from API to validate country & get currency
-  console.log(chalk.gray(`\n  Looking up "${destination}"...`));
+
   const info = await getDestinationInfo(destination.trim());
 
   if (!info) {
@@ -224,7 +224,7 @@ const createTrip = async (): Promise<void> => {
 
   console.log(
     chalk.green(
-      `\n✅ Trip to ${info.countryName} ${info.flag} created & saved! (${startDate} → ${endDate})\n`
+      `\n✅ Trip to ${info.countryName} ${info.flag} created successfully(${startDate} → ${endDate})\n`
     )
   );
 

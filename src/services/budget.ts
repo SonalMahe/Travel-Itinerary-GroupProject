@@ -25,6 +25,7 @@ export const getTotalsPerCategory = (
   };
 
   for (const activity of trip.activities) {
+    
     totals[activity.category] += activity.cost;
   }
 

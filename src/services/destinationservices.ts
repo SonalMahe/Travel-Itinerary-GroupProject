@@ -2,12 +2,6 @@
 // This service fetches destination information from the REST Countries API
 // It provides details like country name, capital, currency, flag, and region
 
-import fetch from "node-fetch";
-import https from "node:https";
-
-// Skip SSL certificate verification (corporate network workaround)
-const agent = new https.Agent({ rejectUnauthorized: false });
-
 export type DestinationInfo = {
   countryName: string;
   capital: string;
@@ -20,8 +14,8 @@ export type DestinationInfo = {
 export const getDestinationInfo = async (country: string): Promise<DestinationInfo | null> => {
   try {
     const response = await fetch(
-      `https://restcountries.com/v3.1/name/${encodeURIComponent(country)}`,
-      { agent }
+      `https://restcountries.com/v3.1/name/${encodeURIComponent(country)}`
+    
     );
 
     if (!response.ok) {
