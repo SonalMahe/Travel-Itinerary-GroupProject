@@ -3,22 +3,29 @@ export type ActivityCategory =
   | "transport"
   | "sightseeing"
   | "accommodation";
- 
+
+// Activity in a trip
 export type Activity = {
   id: string;
   name: string;
   cost: number;
   category: ActivityCategory;
-  startTime: Date;
-  endTime: Date;
+  date: string; // YYYY-MM-DD
 };
- 
+
+// Trip
 export type Trip = {
   id: string;
-  name: any;
+  name: string;
   destination: string;
-  startDate: Date;
-  endDate?: Date;
-  activities: Activity[];
+  startDate: string; // YYYY-MM-DD
+  endDate: string; // YYYY-MM-DD
   currency: string;
+  flag: string;
+  activities: Activity[];
+};
+
+// The full database structure
+export type Database = {
+  trips: Trip[];
 };
