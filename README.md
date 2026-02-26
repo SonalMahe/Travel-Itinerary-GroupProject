@@ -6,7 +6,7 @@ This project focuses on arrays, async programming, and clean architecture using 
 
 👥 Our Team Roles--
 
-1️⃣ Destination Service - Sonal 
+1️⃣ Destination Service & CLI.ts file - Sonal 
 
 Responsible for:-
 
@@ -15,6 +15,8 @@ Fetching country data from an external API
 Returning clean formatted data (not raw API response)
 
 Handling async/await + errors safely
+
+Cli user-interface 
 
 2️⃣ Itinerary Engine - Navya
 
