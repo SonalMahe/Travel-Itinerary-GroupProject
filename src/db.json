@@ -24,6 +24,16 @@
           "date": "2026-02-25"
         }
       ]
+    },
+    {
+      "id": "1772801531989",
+      "name": "India Trip",
+      "destination": "India",
+      "startDate": "2026-99-99",
+      "endDate": "2026-12-12",
+      "currency": "₹",
+      "flag": "🇮🇳",
+      "activities": []
     }
   ]
 }
